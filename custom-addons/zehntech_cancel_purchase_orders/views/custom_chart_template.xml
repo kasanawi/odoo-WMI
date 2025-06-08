@@ -1,0 +1,7 @@
+<odoo>
+    <template id="CustomChartWidget" name="Custom Chart Widget">
+        <div class="o_custom_chart_widget">
+            <canvas style="width: 100%; height: 200px;"></canvas>
+        </div>
+    </template>
+</odoo>

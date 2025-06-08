@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <!-- Form View for Editing the Global Dashboard Image -->
+  <record id="view_cancel_purchase_dashboard_form" model="ir.ui.view">
+    <field name="name">cancel.purchase.dashboard.form</field>
+    <field name="model">cancel.purchase.dashboard</field>
+    <field name="arch" type="xml">
+      <form string="Edit Global Dashboard Image">
+        <sheet>
+          <group>
+            <field name="icon_image"
+                   widget="image"
+                   class="oe_avatar"
+                   options="{'preview_image': 'icon_image'}"/>
+          </group>
+          <footer>
+            <button string="Cancel"
+                    class="btn-secondary"
+                    special="cancel"/>
+            <button name="action_save_icon"
+                    string="Save"
+                    type="object"
+                    class="btn-primary"/>
+          </footer>
+        </sheet>
+      </form>
+    </field>
+  </record>
+
+  <!-- Kanban View for the Dashboard -->
+  <record id="view_cancel_purchase_dashboard_kanban" model="ir.ui.view">
+    <field name="name">cancel.purchase.dashboard.card</field>
+    <field name="model">cancel.purchase.dashboard</field>
+    <field name="arch" type="xml">
+      <kanban class="o_kanban_dashboard" create="false">
+        <field name="employee_id"/>
+        <field name="color"/>
+        <field name="draft_count"/>
+        <field name="confirmed_count"/>
+        <field name="cancelled_count"/>
+        <!-- Instead of using t-raw/t-out, we use a field with widget="html" -->
+        <field name="purchase_bar_html" widget="html"/>
+        <field name="icon_image"/>
+        <field name="record_id_int"/>
+        <field name="selected_date_range"/>
+        <templates>
+          <t t-name="card">
+            <div class="o_card" style="position: relative; padding-top:10px;">
+
+              <!-- Header section with Edit Image aligned right -->
+          <div class="o_card_header"
+                                 style="display: flex; align-items: center; justify-content: space-between; padding: 10px;">
+                                <!-- Left: Header text -->
+                                <h4 style="margin: 0;">
+                                    <t t-if="record.employee_id.raw_value">
+                                        <t t-esc="record.employee_id.value"/>
+                                    </t>
+                                    <t t-else="">
+                    Global Aggregated Data
+                                    </t>
+                                </h4>
+                                <!-- Right: Pencil icon (only for global record) -->
+                                <t t-if="!record.employee_id.raw_value">
+                                    <button type="object"
+                                            name="action_edit_icon"
+                                            class="btn btn-link"
+                                            title="Edit Image"
+                                        style="position:absolute; right:10px; top:5%; transform:translateY(-50%); color:#333; padding:2px;">
+                    <i class="fa fa-pencil" style="font-size:16px;"></i>
+                  </button>
+                </t>
+              </div>
+              <div class="o_kanban_card_body" style="padding: 15px;">
+                <center style="margin-bottom: 20px;">
+                  <t t-if="record.employee_id.raw_value">
+                    <img
+                      t-att-src="'/web/image/res.users/' + record.employee_id.raw_value + '/image_1920'"
+                      class="oe_avatar o_kanban_image emp_image"
+                      style="
+                        border-radius: 8px;
+                        margin-top: 10px;
+                        padding: 5px;
+                        width: 80px;
+                        height: 80px;
+                      "
+                      t-att-title="record.employee_id.value"
+                      t-att-alt="'User: %s' % record.employee_id.value"
+                    />
+                  </t>
+                  <t t-elif="record.icon_image.raw_value">
+                    <img
+                      t-att-src="'/dashboard_icon/' + record.record_id_int.value"
+                      style="
+                        float: none !important;
+                        display: block !important;
+                        margin: 0 auto !important;
+                        border-radius: 8px;
+                        margin-top: 10px;
+                        padding: 5px;
+                        width: 80px;
+                        height: 80px;
+                      "
+                      alt="Global Icon"
+                    />
+                  </t>
+                  <t t-else="">
+                    <img
+                      src="/zehntech_cancel_purchase_orders/static/description/fallback.png"
+                      style="
+                        float: none !important;
+                        display: block !important;
+                        margin: 0 auto !important;
+                        border-radius: 8px;
+                        margin-top: 10px;
+                        padding: 5px;
+                        width: 80px;
+                        height: 80px;
+                      "
+                      alt="Global Aggregated Data"
+                    />
+                  </t>
+                </center>
+                <!-- Display selected custom date range if any -->
+                <t t-if="record.selected_date_range.raw_value">
+                  <div style="text-align:center; margin-bottom:5px; font-size:12px;">
+                    <t t-esc="record.selected_date_range.value"/>
+                  </div>
+                </t>
+                <!-- The HTML-based bar is rendered by the HTML widget above -->
+                <div style="text-align: center; margin-bottom: 15px;">
+                  <button type="object"
+                          name="action_open_custom_range_wizard"
+                          class="btn btn-secondary">
+                    <span>Custom Date Range</span>
+                  </button>
+                </div>
+
+                <!-- Buttons container -->
+                <div style="display: flex; flex-direction: column; gap: 15px; margin-top: 15px;">
+                  <!-- QUOTATION -->
+                  <a class="btn btn-primary text-white"
+                     name="action_open_draft_records"
+                     type="object"
+                     role="button"
+                     style="padding: 10px; display: flex; justify-content: space-between; align-items: center;">
+                    <span>RFQ</span>
+                    <span style="font-size: 15px; font-weight: bold; color: white;" t-esc="record.draft_count.value"/>
+                  </a>
+
+<!-- SALE ORDER -->
+                  <a class="btn btn-success text-white"
+                     name="action_open_confirmed_records"
+                     type="object"
+                     role="button"
+                     style="padding: 10px; display: flex; justify-content: space-between; align-items: center;">
+                    <span>PURCHASE ORDER</span>
+                    <span style="font-size: 15px; font-weight: bold; color: white;" t-esc="record.confirmed_count.value"/>
+                  </a>
+
+<!-- CANCELLED -->
+                  <a class="btn btn-danger text-white"
+                    name="action_open_cancelled_records"
+                    type="object"
+                    role="button"
+                    style="padding: 10px; display: flex; justify-content: space-between; align-items: center;">
+                    <span>CANCELLED</span>
+                    <span style="font-size: 15px; font-weight: bold; color: white;"
+                          t-esc="record.cancelled_count.value"/>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </t>
+        </templates>
+      </kanban>
+    </field>
+  </record>
+
+</odoo>
