@@ -47,3 +47,4 @@ for details and get in touch with us via email.
 # odoo18-poinex
 # odoo18-poinex
 # odoo-WMI
+# odoo18-poinex
